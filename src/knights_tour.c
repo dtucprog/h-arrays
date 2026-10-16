@@ -1,4 +1,4 @@
-// Solves the Knight's tour problem
+// Solves the knight's tour problem
 
 #include <limits.h>
 #include <stdio.h>
@@ -22,7 +22,7 @@ enum {
   NO_MOVE = MOVE_COUNT
 }; // Identifier that reflects that none of the moves is possible. Used in
    // `move_*` functions.
-typedef enum { GREEDY, WITH_ACCESSIBILITY_METRIC } Strategy;
+typedef enum { GREEDY, ACCESSIBILITY } Strategy;
 
 // Prints the contents of the board.
 void print_board(Board board) {
@@ -65,7 +65,7 @@ size_t move_greedy(size_t x, size_t y, Board visited) {
 
 // Returns the move_id of the least accessible move from (x, y) or NO_MOVE if
 // none exists.
-size_t move_with_accessibility_metric(size_t x, size_t y, Board visited) {
+size_t move_by_accessibility(size_t x, size_t y, Board visited) {
   // YOUR CODE HERE
 }
 
@@ -74,16 +74,23 @@ size_t move(size_t x, size_t y, Board visited, Strategy strategy) {
   switch (strategy) {
   case GREEDY:
     return move_greedy(x, y, visited);
-  case WITH_ACCESSIBILITY_METRIC:
-    return move_with_accessibility_metric(x, y, visited);
+  case ACCESSIBILITY:
+    return move_by_accessibility(x, y, visited);
   }
 }
 
-/* Attempts a tour by picking the first accessible square beginning at (x, y),
-returns number of visited squares.
+/* Attempts a knight's tour from (x, y) using the given strategy and returns
+the number of squares visited.
 
-An array is created for the attempt.
-print_result: If true, then the board is printed at the end of the tour.
+Wt each step the strategy picks the next move, and the tour ends when no
+unvisited square is reachable. A return value of SIZE * SIZE means every square
+was visited; a smaller value means the tour got stuck in a dead end.
+
+x, y: Starting square (column, row), both in [0, SIZE).
+strategy: How the next move is chosen.
+print_result: If true, prints the board at the end of the tour. Each square
+shows the step at which it was visited (1 for the start), and unvisited
+squares show 0.
 */
 int tour(size_t x, size_t y, Strategy strategy, bool print_result) {
   Board visited = {};
@@ -115,28 +122,25 @@ int main() {
   Board visits_greedy = {};
   tour_from_each_square(visits_greedy, GREEDY);
   puts("Visited squares starting from each square");
-  puts("Greedy:");
+  puts("Using the greedy strategy:");
   print_board(visits_greedy);
   puts("");
 
-  puts("Example tour with greedy strategy:");
-  tour(0, 1, GREEDY, true);
-  puts("");
+  size_t x = 0, y = 1;
 
-  puts("Accessibility table:");
-  Board accessibility = {};
-  calculate_accessibility(accessibility, (Board){});
-  print_board(accessibility);
+  printf("Tour from (x=%zu, y=%zu)\n", x, y);
+  puts("Using the greedy strategy:");
+  tour(x, y, GREEDY, true);
   puts("");
 
   Board visits_accessibility = {};
-  tour_from_each_square(visits_accessibility, WITH_ACCESSIBILITY_METRIC);
+  tour_from_each_square(visits_accessibility, ACCESSIBILITY);
   puts("Visited squares starting from each square");
-  puts("With accessibility metric:");
+  puts("Using accessibility:");
   print_board(visits_accessibility);
   puts("");
 
-  puts("Example tour with accessibility metric:");
-  tour(0, 1, WITH_ACCESSIBILITY_METRIC, true);
-  puts("");
+  printf("Tour from (x=%zu, y=%zu)\n", x, y);
+  puts("Using accessibility:");
+  tour(x, y, ACCESSIBILITY, true);
 }
